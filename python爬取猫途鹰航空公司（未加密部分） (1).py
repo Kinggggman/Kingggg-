@@ -12,11 +12,12 @@ from lxml import etree
 import json
 
 
-if __name__ == '__main__':
+if __name__ == '__main__':#新手学代码时 照搬的 好像不用主函数程序也可以完成运行
     data = []
     Comment = []
     User = []
     Point = []
+    #提前设好需要用到的保存数据的集合
     urls = [
         "https://cn.tripadvisor.com/ShowUserReviews-g1-d8729051-r925876856-China_Southern_Airlines-World.html",
         "https://cn.tripadvisor.com/ShowUserReviews-g1-d8729051-r757296659-China_Southern_Airlines-World.html",
@@ -70,21 +71,31 @@ if __name__ == '__main__':
         "https://cn.tripadvisor.com/ShowUserReviews-g1-d8729051-r373247424-China_Southern_Airlines-World.html",
         "https://cn.tripadvisor.com/ShowUserReviews-g1-d8729051-r368672123-China_Southern_Airlines-World.html",
         "https://cn.tripadvisor.com/ShowUserReviews-g1-d8729051-r366806384-China_Southern_Airlines-World.html"]
+    #url 由于因为访问网址的无序性（网址访问的变动部分是无序的，猜想是根据某一个评论的位置而定，而我们是进行中文评论的爬取，这期间评论是经过网站筛选的，所以呈现无序），只能将需要爬取的网站url手动添加成一个集合
     headers = {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36 Edg/120.0.0.0',
         "Referer": 'https://cn.tripadvisor.com/'
+        #UA应该是必须的（绕过反爬机制的基本操作），Referer有些网站不需要也可以运行代码，这里可能也不需要。
     }
 
     for url in urls:
         user_name_list = []
         comment_list = []
         point_list = []
+        #提前设置好需要用到的保存信息的集合，主要是配合下面while循环的判断
         print(url)
+        #打印出正在爬取的url
         response = requests.get(url=url, headers=headers)
         print(response.status_code)
+        #返回request的响应值是在写代码过程中 看爬取过程中出现的问题的可能性，有利于分析爬取过程。 这里是不是返回200或者403不影响爬取信息
         while len(user_name_list) == 0:
+        #这个while循环是为了防止加载出了url，但网址的信息内容由于网速原因（我猜）或者其他什么因素导致没有加载完毕，无法正常读取到信息。
             page_text = requests.get(url=url, headers=headers).text
-            # <p class ="partial_entry" > </p>
+            #通过request的get请求 请求到网址的源代码信息，并以text格式保存在page_text的变量中
+            #也可以这样写
+            #sui-bian-yi-ge-bian-liang-ming = requests.get(url=url, headers=headers)
+            #page_text = sui-bian-yi-ge-bian-liang-ming.text
+
             ex2 = '<div class="username mo">.*?>(.*?)<.*?</div>'
             user_name_list = re.findall(ex2, page_text, re.S)
             print(user_name_list)
@@ -96,21 +107,26 @@ if __name__ == '__main__':
             ex3 = '<span class="ui_bubble_rating bubble_(.*?)0">.*?</span>'
             point_list = re.findall(ex3, page_text)
             print(point_list)
+            #以上三个部分就是通过正则化读取到对应匹配的位置，将需要爬取的信息匹配到并保存在变量中
             time.sleep(10)
+            #在频繁进行爬虫操作的过程中会遇到反爬机制的检测（过于频繁的访问一个url）会导致报错。所以在这里设置一个休息间断。
 
         Point = Point + point_list
         User = User + user_name_list
         Comment = Comment + comment_list
+        #在对一个url中的信息爬取完成后，保存在我们提前设置好的集合中
 
     f = open("中国南方航空1.csv", "w", encoding="utf-8-sig", newline="")
     csvwritter = csv.writer(f)
+    #没有相应命名的文件就会创建一个对应名字的.csv文件，将writer操作赋予 一个变量
 
     for i in range(len(Comment)):
         data = [User[i]] + [Point[i]] + [Comment[i]]
         csvwritter.writerow(data)
-    # with open('./pinglun.html','wb',encoding='utf') as fp:
-    #    fp.write(page_text)
+    #循环将我们之前收集到的信息 一条一条的写在我们前面创建的文件中
     print('over')
+
+
 '''
 urls = ["https://cn.tripadvisor.com/ShowUserReviews-g1-d8729000-r804465644-Air_China-World.html",
             "https://cn.tripadvisor.com/ShowUserReviews-g1-d8729000-r752355879-Air_China-World.html",
@@ -279,16 +295,5 @@ urls =[
 
 ]-中国南方航空公司url
 '''
-# UA_list = [
-#     "Mozilla/5.0 (Linux; Android 4.2.1; M040 Build/JOP40D) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/31.0.1650.59 Mobile Safari/537.36",
-#     "Mozilla/5.0 (Linux; U; Android 4.4.4; zh-cn; M351 Build/KTU84P) AppleWebKit/534.30 (KHTML, like Gecko) Version/4.0 Mobile Safari/534.30",
-#     "Mozilla/5.0 (iPhone; CPU iPhone OS 8_3 like Mac OS X) AppleWebKit/600.1.4 (KHTML, like Gecko) Version/8.0 Mobile/12F70 Safari/600.1.4",
-#     "Mozilla/5.0 (iPhone; CPU iPhone OS 7_0_4 like Mac OS X) AppleWebKit/537.51.1 (KHTML, like Gecko) CriOS/31.0.1650.18 Mobile/11B554a Safari/8536.25",
-#     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/72.0.3626.121 Safari/537.36",
-#     "Mozilla/5.0 (Windows NT 10.0; WOW64; Trident/7.0; rv:11.0) like Gecko",
-#     "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/12.0.3 Safari/605.1.15",
-#     "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.12; rv:65.0) Gecko/20100101 Firefox/65.0",
-#     "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.75 Safari/537.36",
-#     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.140 Safari/537.36 Edge/18.17763",
-#     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36 Edg/120.0.0.0"]
+
 

@@ -13,12 +13,11 @@ data = []
 Comment = []
 User = []
 Point = []
+#提前设好需要用到的保存数据的集合
 
-# urls = ['https://cn.tripadvisor.com/OverlayWidgetAjax?Mode=EXPANDED_HOTEL_REVIEWS&metaReferer=ShowUserReviews',-中国国际航空
-#         'https://cn.tripadvisor.com/OverlayWidgetAjax?Mode=EXPANDED_HOTEL_REVIEWS&metaReferer=ShowUserReviews',-中国东方航空
-#         '']
 url = 'https://cn.tripadvisor.com/OverlayWidgetAjax?Mode=EXPANDED_HOTEL_REVIEWS&metaReferer=ShowUserReviews'
-
+#在不同的网址下可能需要进行url的修改，这里都是同样的我就不进行修改了
+#如果有需要的话 可以尝试 设置 urls=[] 把所有的url放进去 然后设一个循环， 或者通过网址的规律变化设置循环
 Reviews=[
         '757582248','716685262','694952005','694379453','714747571','676786134',
         '669158895','666669687','677250852','660122615','659878084','657781687',
@@ -42,11 +41,13 @@ Reviews=[
         '371115919','371115866','370868416','370066983','368672110','368404930',
         '368403980','367151585','368672123','366806384'
 ]
+#由于这些评论放在后续请求的的文件中，且只有参数的变化，所以这里把那些不规律的评论的参数统一放在一个集合中方便循环。
 headers = {
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36 Edg/120.0.0.0',
     'Referer':'https://cn.tripadvisor.com/ShowUserReviews-g1-d8729000-r804465644-Air_China-World.html',
     'Cookie':'TASameSite=1; TAUnique=%1%enc%3AjYF91P0b3tpHAsDhghvm73quG5OSFSRMrBKphU8KzJ4IFRzS%2B6QwHUJAswmwMYgfNox8JbUSTxk%3D; TASSK=enc%3AAAfbh%2FgFEeLvpTf2p7Mlgy1xUfavdwJVXugyNjt1LVJz2p27lmWU1x2EpQjtQjqGuIRVvCkc%2FIsCl97GWZV9%2FfiR1GQslqAb4FPUPaUQ%2FehQyWuSS1OVqPqEHltcl8fO%2Bw%3D%3D; TART=%1%enc%3ALIlNnjMq3x9GPrk38Yt3CmYafRkYCb9CaffJ7Btcn0coScy85kXUfTlElFh4k3ttmEKXuc1TgSo%3D; TATrkConsent=eyJvdXQiOiJTT0NJQUxfTUVESUEiLCJpbiI6IkFEVixBTkEsRlVOQ1RJT05BTCJ9; _ga=GA1.1.1385501347.1702261526; pbjs_sharedId=19bfacdd-b943-47db-8bcf-fd55c33e9e3c; pbjs_sharedId_cst=zix7LPQsHA%3D%3D; _lc2_fpi=b140173de591--01hhbb3883xmythh3efx6r6xj1; _lc2_fpi_meta=%7B%22w%22%3A1702261530883%7D; _lr_env_src_ats=false; pbjs_unifiedID=%7B%22TDID%22%3A%2221cadc02-4c5f-40bc-ab00-1a7fce1ec976%22%2C%22TDID_LOOKUP%22%3A%22FALSE%22%2C%22TDID_CREATED_AT%22%3A%222023-12-11T02%3A25%3A39%22%7D; pbjs_unifiedID_cst=zix7LPQsHA%3D%3D; TATravelInfo=V2*AY.2023*AM.12*AD.24*DY.2023*DM.12*DD.25*A.2*MG.-1*HP.2*FL.3*DSM.1702267617872*RS.1; TALanguage=zhCN; VRMCID=%1%V1*id.10570*llp.%2FAirline_Review-d8729050-Reviews-China-Eastern-Airlines*e.1702977772414; TADCID=LMk2uZG0BBT1l926ABQCCKy0j55CTpGVsECjuwJMq3o1EQj9ai3WnZmNKx6tleGxwKC1s6EiTpfy5DnNctx2_ry6M_7VuuBGytY; PAC=AEImXkdTff9gXe8V_YqcyNkyHmNAJoV7jHTeYzFbaEDwiif6tCbNJVZoKMYMyFrzDvNVssGQptncNHq1M-FpaLpZ7yftNJPoKz5238izDPBdetMkdgOImRYaD3UB2_8zTSWlmJbWfyGQMsHVf9L4JFxtOr2whWQmTrx4mqIANb9RE6t49YYom2zZqt_ey0fQYw%3D%3D; ServerPool=X; PMC=V2*MS.88*MD.20231210*LD.20231214; _abck=103E54A598E4912FA9A5E60D051A7CDD~-1~YAAQhb8mF12q8mOMAQAAcvwKaAs5LI+0BVP9Pm4b+OVgiqle9H+9IsZ308GOzd0hI4E5PZyzmgb1F5CE6GOINZS9uOWptm2U9w3QX3ftBt3CG1uvjy2gpJy+tkuHTvc3SofSzjUfPjJcyTcvpWHOSM9s9H0ajFSaPN/fUv1T/l7hIRasFCvvQvyUzioF2J1SNYvjVkj6O8CcRwPozrDkalptoRUhq74LLM6jB6iU5LKQTVbRZD6Cy40Z7ySSyAVzD9sIVrsfA51WyL66iqUyAD3zwZQKf5hycztvZx8FdTZFURaR26judNreX8JAzosGNc8OkyuioNPIjNyXkDKumBhdHz4ZfNFOI0gVS8ct+plBMrjTofu77qVSay4ZxJVSaHtLT+TteNWQZhrT9uZnJA==~-1~-1~-1; bm_sz=6BA49A78F535042224FFE8B544DC17C5~YAAQhb8mF16q8mOMAQAAcvwKaBYSIZNhWwq5EyOHJDPRtBTWP6hhkhJgE3iUzfT1r5OvWyky0rVYzrORe4htQK1xmY1AAa0Mcr/CojNoCsKiR3A3Q9+cM64aOrm/MPfJ+fxMSx3XHCFd24p9loOg9dIpSIndcel86nBlP/XlYqqVnzxu0WLnMs3i46qI65kYkCSoJ3oP6sSGecSZQLveqcWdZfN/r/QpN/uHoWaZBADqG/wPFAbZyq0k6VLK+J4b7VlNooScmc0BYWRmhkuSavaTSbQkag/80ulC4/8rdTnmMc+jOw4cFA==~4408887~3555896; _li_dcdm_c=.tripadvisor.com; _lr_sampling_rate=100; __li_idex_cache2_InByZWJpZC82NDQzOT9kdWlkPWIxNDAxNzNkZTU5MS0tMDFoaGJiMzg4M3hteXRoaDNlZng2cjZ4ajEmcmVzb2x2ZT1ub25JZCZyZXNvbHZlPW1hZ25pdGUi=%7B%7D; __li_idex_cache2_InByZWJpZC82NDQzOT9kdWlkPWIxNDAxNzNkZTU5MS0tMDFoaGJiMzg4M3hteXRoaDNlZng2cjZ4ajEmcmVzb2x2ZT1ub25JZCZyZXNvbHZlPW1hZ25pdGUi_meta=%7B%22w%22%3A1702552619384%2C%22e%22%3A1702556219000%7D; pbjs_li_nonid=%7B%7D; pbjs_li_nonid_cst=zix7LPQsHA%3D%3D; G_AUTH2_MIGRATION=informational; TAReturnTo=%1%%2FShowUserReviews-g1-d8729000-r804465644-Air_China-World.html; OptanonConsent=isGpcEnabled=0&datestamp=Thu+Dec+14+2023+19%3A24%3A17+GMT%2B0800+(%E4%B8%AD%E5%9B%BD%E6%A0%87%E5%87%86%E6%97%B6%E9%97%B4)&version=202310.2.0&browserGpcFlag=0&isIABGlobal=false&hosts=&consentId=7fb30751-d27c-4be4-b4a2-d3286dde6bf1&interactionCount=1&landingPath=NotLandingPage&groups=C0001%3A1%2CC0002%3A1%2CC0003%3A1%2CC0004%3A1&AwaitingReconsent=false; _ga_QX0Q50ZC9P=GS1.1.1702552610.12.1.1702553057.60.0.0; ab.storage.deviceId.6e55efa5-e689-47c3-a55b-e6d7515a6c5d=%7B%22g%22%3A%22bedf6862-8384-695f-61b3-0ab92f22c19a%22%2C%22c%22%3A1702267517788%2C%22l%22%3A1702553058602%7D; ab.storage.sessionId.6e55efa5-e689-47c3-a55b-e6d7515a6c5d=%7B%22g%22%3A%225568372c-1f96-e507-9641-b5b94eefbf8e%22%2C%22e%22%3A1702553118612%2C%22c%22%3A1702553058601%2C%22l%22%3A1702553058612%7D; __gads=ID=4c5ed3959617812a:T=1702261534:RT=1702556010:S=ALNI_MYDS-TCiF1YFyS3-R-Etl2apqEAxQ; __gpi=UID=00000ca93626e234:T=1702261534:RT=1702556010:S=ALNI_MYvLE68S9zTYAJ_a6h4QT_NlEjmIg; SRT=TART_SYNC; TASID=9A8CBAB7238541EFB728B2D2686823D3; TASession=V2ID.9A8CBAB7238541EFB728B2D2686823D3*SQ.16*LS.DemandLoadAjax*HS.recommended*ES.popularity*DS.5*SAS.popularity*FPS.oldFirst*FA.1*DF.0*TRA.true*LD.8729000*EAU._; TAUD=LA-1702261304798-1*RDD-1-2023_12_10*ARDD-6313422-2023_12_24.2023_12_25*HDD-291747903-2023_12_24.2023_12_25*LG-294712289-2.1.F.*LD-294712290-.....; datadome=hanm5UoQplEg4yCOEfFfcFHg63c8tCJSaGCjP9glAdSETbZ0WJbHLiwsVJ1WLolV89gaceahiDQ~Y~C_NtJORmbiWYCEbo5LSDVJrFmQ9YViVyqQ_C~QYiAA27bwFLTN; __vt=lfYMWy6BmoJxacUkABQCCQPEFUluRFmojcP0P3EgGioS9WDkUayfU_pxWqcfZM-tcE0UfOIL2F6B9pNlHGIGGlF-YbfD-X9SH7qSZu-MNpZQHO0CHBkRczFgF9fc9R8z4BKWzZvua9PepIKYoxj_toTcEQ'
 }
+#UA设置是反爬设置的基操，Referer和Cookie 在POST文件中有 我就加上了，具体需不需要没有尝试过。
 for i in range(0,len(Reviews)):
     data={
         'reviews': Reviews[i],
@@ -57,13 +58,14 @@ for i in range(0,len(Reviews)):
         'haveCsses': 'long_lived_global_legacy, airline_sur, sur_reviews',
         'Action': 'install'
         }
+    #data参数 放在循环中只是为了 参数能进行迭代。
 
     page_text =requests.post(url=url, headers=headers, data=data).text
     bes = bs4.BeautifulSoup(page_text,'lxml')
     texts = bes.find('div', id="", class_="entry")
     texts_list= texts_list+texts.text.split("\xa0"*4)
     print(texts.text.split("\xa0"*4))
-
+    #bs4方法进行评论文本的截取，这里是进行尝试的时候 刚刚好用了这个方法 成功了，用正则化方法应该也可以。都是将网页信息文本化然后截取
     ex2 = '<div class="username mo">.*?>(.*?)<.*?</div>'
     user_name_list = re.findall(ex2, page_text, re.S)
     User = User + user_name_list
@@ -73,6 +75,8 @@ for i in range(0,len(Reviews)):
     point_list = re.findall(ex3, page_text)
     Point = Point + point_list
     print(point_list)
+    #这里正则化其实跟未加密部分代码是同理
+
 
 f = open("中国南方航空2.csv", "w", encoding="utf-8-sig", newline="")
 csvwritter = csv.writer(f)
@@ -82,6 +86,7 @@ for i in range(len(texts_list)):
     csvwritter.writerow(database)
 
 print("Over")
+#这里跟未加密部分操作相同 不多加赘述了
 '''
 Reviews=
 ['732027085','768679675','694376423','689777430','694952521','688407554','663956812','649656405','625344565','359996690','929225828','360312517',
